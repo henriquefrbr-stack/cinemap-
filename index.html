@@ -380,14 +380,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 <script>
 // ─────────────────────────────────────────
-// CONFIG — chaves lidas do sessionStorage (trocar via comando "config")
+// CONFIG — chaves ficam no servidor (Vercel env vars)
 // ─────────────────────────────────────────
-const API_KEY  = sessionStorage.getItem('cm_tmdb_key') || '86bd12e8be1fd53610838006611d1751';
-const GROQ_KEY = sessionStorage.getItem('cm_groq_key') || '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';
-const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const TMDB     = 'https://api.themoviedb.org/3';
-const W185     = 'https://image.tmdb.org/t/p/w185';
-const W500     = 'https://image.tmdb.org/t/p/w500';
+const W185 = 'https://image.tmdb.org/t/p/w185';
+const W500 = 'https://image.tmdb.org/t/p/w500';
 const MAX_C   = 5;
 const CHIPS   = ['Inception','Interstellar','Parasite','The Dark Knight',
                  'Pulp Fiction','Amélie','1917','Whiplash','The Matrix','Oppenheimer'];
@@ -496,9 +492,8 @@ document.querySelectorAll('.overlay').forEach(o=>{
 // TMDB API
 // ─────────────────────────────────────────
 async function apiFetch(path, params={}) {
-  const u = new URL(TMDB+path);
-  u.searchParams.set('api_key', API_KEY);
-  u.searchParams.set('language','pt-BR');
+  const u = new URL('/api/tmdb', location.origin);
+  u.searchParams.set('path', path.replace(/^\//, ''));
   Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));
   const r = await fetch(u);
   if (!r.ok) throw new Error(r.status);
@@ -512,15 +507,14 @@ const getRecommended  = id => apiFetch(`/movie/${id}/recommendations`, {page:1})
 // GROQ — curadoria de filmes por IA
 // ─────────────────────────────────────────
 async function askGroq(title, temperature=0.7, excludeTitles=[]) {
-  if (!GROQ_KEY || GROQ_KEY === 'COLE_SUA_CHAVE_AQUI') return null;
   try {
     const exclusion = excludeTitles.length > 0
       ? `\nNão sugira nenhum destes filmes que já foram exibidos: ${excludeTitles.join(', ')}`
       : '';
     const prompt = `Você é um curador de cinema especialista. Dado o filme informado, retorne um objeto JSON com exatamente esta estrutura.\nIMPORTANTE: Retorne SOMENTE o objeto JSON, sem texto antes ou depois, sem markdown, sem backticks, sem explicações.\n{\n  "diretor": ["Filme 1", "Filme 2"],\n  "tema": ["Filme 1", "Filme 2", "Filme 3", "Filme 4", "Filme 5", "Filme 6"],\n  "epoca": ["Filme 1"],\n  "coringa": ["Filme 1"]\n}\nRegras:\n- diretor: 2 filmes do mesmo diretor do filme informado\n- tema: 6 filmes de tema ou gênero parecido, bem avaliados\n- epoca: 1 filme marcante da mesma década do filme informado\n- coringa: 1 filme surpreendente que fãs do filme informado costumam amar mas não é óbvio\n- Todos os filmes devem ser conhecidos, com boa avaliação, de 1980 em diante\n- Não repetir o próprio filme informado\n- Seja preciso nas categorias. Para a categoria diretor coloque APENAS filmes que realmente foram dirigidos pelo mesmo diretor do filme informado. Se não souber com certeza quem dirigiu, prefira colocar o filme em tema. Não invente conexões que não existem.${exclusion}\nFilme: ${title}`;
-    const res = await fetch(GROQ_URL, {
+    const res = await fetch('/api/groq', {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${GROQ_KEY}`, 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: prompt }], temperature, max_tokens: 400 })
     });
     if (!res.ok) return null;
