@@ -503,23 +503,22 @@ function syncCoins() {
 
 async function spendCoin() {
   if (S.user) {
-    // Usuário logado: debita no servidor
+    // Usuário logado: verifica localmente antes de chamar API
+    if (S.coins <= 0) { openModal('nocoins-modal'); return false; }
     try {
       const r = await fetch('/api/coins', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${S.token}`, 'Content-Type': 'application/json' }
       });
-      if (r.status === 402) { openModal('nocoins-modal'); return false; }
+      if (r.status === 402) { S.coins = 0; syncCoins(); openModal('nocoins-modal'); return false; }
       if (r.ok) {
         const data = await r.json();
         S.coins = data.coins;
       } else {
-        // Erro no servidor: debita localmente para não bloquear o usuário
-        S.coins = Math.max(0, S.coins - 1);
+        S.coins--;
       }
     } catch(e) {
-      // Erro de rede: debita localmente
-      S.coins = Math.max(0, S.coins - 1);
+      S.coins--;
     }
   } else {
     // Convidado: debita local
