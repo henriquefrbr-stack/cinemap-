@@ -503,8 +503,14 @@ function syncCoins() {
 
 async function spendCoin() {
   if (S.user) {
-    // Usuário logado: verifica localmente antes de chamar API
-    if (S.coins <= 0) { openModal('nocoins-modal'); return false; }
+    // Usuário logado: se zerado, verifica no servidor (pode ser novo dia)
+    if (S.coins <= 0) {
+      try {
+        const check = await fetch('/api/auth', { headers: { 'Authorization': `Bearer ${S.token}` } });
+        if (check.ok) { const d = await check.json(); S.coins = d.coins ?? 0; syncCoins(); }
+      } catch(e) {}
+      if (S.coins <= 0) { openModal('nocoins-modal'); return false; }
+    }
     try {
       const r = await fetch('/api/coins', {
         method: 'POST',
