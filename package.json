@@ -1,0 +1,23 @@
+{
+  "name": "cinemap",
+  "version": "1.0.0",
+  "description": "cinemap",
+  "main": "groq.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://henriquefrbr-stack@github.com/henriquefrbr-stack/cinemap-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/henriquefrbr-stack/cinemap-/issues"
+  },
+  "homepage": "https://github.com/henriquefrbr-stack/cinemap-#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.99.3"
+  }
+}
