@@ -26,12 +26,16 @@ export default async function handler(req, res) {
   if (!profile) return res.status(404).json({ error: 'profile not found' });
   if (profile.coins <= 0) return res.status(402).json({ error: 'no coins' });
 
-  const { data: updated } = await supabase
+  const { data: updated, error: updateError } = await supabase
     .from('profiles')
     .update({ coins: profile.coins - 1 })
     .eq('id', user.id)
     .select('coins')
     .single();
+
+  if (updateError || !updated) {
+    return res.status(500).json({ error: 'failed to update coins' });
+  }
 
   return res.status(200).json({ coins: updated.coins });
 }
