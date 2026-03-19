@@ -368,7 +368,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <!-- GATE MODAL (aparece na 4ª moeda sem login) -->
 <div class="overlay" id="gate-modal">
   <div class="modal">
-    <button class="modal-x" onclick="closeModal('gate-modal')">✕</button>
+    <button class="modal-x" onclick="closeModal('gate-modal');if(S.view==='network'){if(S.sim)S.sim.stop();showView('home');}">✕</button>
     <h3>🎬 Continue explorando</h3>
     <p>Você usou suas 3 buscas gratuitas. Crie uma conta grátis e ganhe <strong>5 moedas por dia</strong> para continuar descobrindo filmes.</p>
     <button class="btn btn-primary" style="width:100%;padding:12px;font-size:14px;margin-bottom:10px" onclick="closeModal('gate-modal');switchTab('signup');openModal('auth-modal')">Criar conta grátis</button>
@@ -639,8 +639,8 @@ function renderAC(movies) {
         <div class="ac-year">${yr(m.release_date)}</div>
       </div>
       ${m.vote_average ? `<div class="ac-rate">★ ${m.vote_average.toFixed(1)}</div>` : ''}`;
-    d.addEventListener('click', ()=>{
-      if (!spendCoin()) return;
+    d.addEventListener('click', async ()=>{
+      if (!await spendCoin()) return;
       closeAC();
       $('search-input').value = m.title;
       loadNetwork(m);
@@ -673,7 +673,7 @@ $('search-btn').addEventListener('click', ()=>{ const v=$('search-input').value.
 document.addEventListener('click', e=>{ if(!e.target.closest('.search-wrap')) closeAC(); });
 
 async function doSearch(q) {
-  if (!spendCoin()) return;
+  if (!await spendCoin()) return;
   showLoad();
   try {
     const d = await searchMovies(q);
@@ -988,7 +988,7 @@ function buildGraph(center, related) {
 
       // Desktop: click related node → load new network
       if (d.type === 'r') {
-        if (!spendCoin()) return;
+        if (!await spendCoin()) return;
         hideTip();
         await loadNetwork(d.m);
       }
@@ -1130,7 +1130,7 @@ $('bs-bg').addEventListener('click', closeBS);
 $('bs-explore').addEventListener('click', async () => {
   const m = S.bsMovie;
   if (!m) return;
-  if (!spendCoin()) return;
+  if (!await spendCoin()) return;
   closeBS();
   await loadNetwork(m);
 });
@@ -1243,7 +1243,7 @@ async function doAuth() {
   }
 }
 
-async function setUser(session) {
+async function setUser(session, showToast=false) {
   if (!session) {
     S.user  = null;
     S.token = null;
@@ -1269,7 +1269,7 @@ async function setUser(session) {
   closeModal('auth-modal');
   closeModal('gate-modal');
   syncCoins();
-  toast('✅ Login realizado!', 'ok');
+  if (showToast) toast('✅ Login realizado!', 'ok');
 }
 
 async function doLogout() {
@@ -1279,11 +1279,14 @@ async function doLogout() {
   toast('Até logo!', '');
 }
 
-// Ouvir mudanças de sessão (login, logout, refresh)
-_supa.auth.onAuthStateChange((_event, session) => setUser(session));
+// Ouvir mudanças de sessão
+_supa.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN')  setUser(session, true);
+  if (event === 'SIGNED_OUT') setUser(null, false);
+});
 
-// Restaurar sessão ao carregar a página
-_supa.auth.getSession().then(({ data }) => { if (data.session) setUser(data.session); });
+// Restaurar sessão ao carregar a página (sem toast)
+_supa.auth.getSession().then(({ data }) => { if (data.session) setUser(data.session, false); });
 
 // ─────────────────────────────────────────
 // CONFIG (modal secreto)
