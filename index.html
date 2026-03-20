@@ -255,28 +255,30 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .auth-terms{text-align:center;font-size:11px;color:#3a4152;line-height:1.6}
 .auth-terms a{color:#4a5468;text-decoration:underline}
 
+/* ── COIN MOBILE PILL ── */
+#coin-mobile{display:none;position:fixed;bottom:24px;left:20px;z-index:10;background:rgba(13,15,23,.92);border:1px solid var(--border);border-radius:20px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--accent-dim);backdrop-filter:blur(6px);cursor:pointer;transition:border-color .2s,color .2s;white-space:nowrap;user-select:none}
+#coin-mobile:hover{border-color:var(--accent-dim);color:var(--text)}
+#coin-mobile.warn{color:var(--gold);border-color:rgba(240,192,64,.4)}
+
 /* ── RESPONSIVE ── */
 @media(max-width:640px){
   #header{padding:0 12px;gap:8px}
   #logo{font-size:17px}
   .btn{padding:6px 10px;font-size:12px}
-  #coin-display{font-size:12px;padding:4px 9px}
   #btn-plans-hdr{display:none!important}
+  #coin-display{display:none!important}
+  #coin-mobile{display:block}
   .plans-grid{grid-template-columns:1fr}
   .hero h1{font-size:38px}
   .hero p{font-size:15px}
-  /* Network bar: só essencial */
   #shuffle-btn{display:none!important}
   #net-coins{display:none}
 }
 @media(max-width:480px){
-  /* Header: hide logo text, user email — só ícone + moedas + botão */
   #logo span{display:none}
   #logo{flex:0 0 auto;gap:0}
   #user-info{display:none!important}
-  #coin-display{background:transparent;border:none;padding:4px 6px;font-size:13px;font-weight:600}
   #auth-btns{gap:6px}
-  /* Network bar */
   #net-bar{padding:0 10px;gap:8px}
   #net-title{font-size:13px}
   #bs-inner{gap:12px;padding:14px 14px 6px}
@@ -334,6 +336,9 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <button class="btn" id="btn-plans-hdr" onclick="showView('plans')">Ver Planos</button>
   </div>
 </header>
+
+<!-- COIN PILL (mobile only) -->
+<div id="coin-mobile" onclick="showView('plans')">🪙 3/3 · Planos</div>
 
 <!-- HOME VIEW -->
 <div id="home-view" class="view active">
@@ -639,7 +644,10 @@ function syncCoins() {
   const t = `🪙 ${S.coins}/${max}`;
   $('coin-display').textContent = t;
   $('net-coins').textContent = t;
-  $('coin-display').classList.toggle('warn', S.coins <= 1);
+  $('coin-mobile').textContent = t + ' · Planos';
+  const warn = S.coins <= 1;
+  $('coin-display').classList.toggle('warn', warn);
+  $('coin-mobile').classList.toggle('warn', warn);
 }
 
 async function spendCoin() {
