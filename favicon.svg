@@ -1,0 +1,43 @@
+<svg viewBox="0 0 110 90" xmlns="http://www.w3.org/2000/svg">
+  <!-- Corpo da fita -->
+  <rect x="0" y="0" width="110" height="90" rx="3" fill="#1a2a3a"/>
+  <!-- Área de exposição -->
+  <rect x="1" y="18" width="108" height="54" fill="#0d1520" stroke="#3d7aad" stroke-width="0.8"/>
+  <!-- Furos superiores -->
+  <rect x="4"    y="3" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="19.2" y="3" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="34.3" y="3" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="49.5" y="3" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="64.7" y="3" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="79.8" y="3" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="95"   y="3" width="11" height="12" rx="2" fill="#090c12"/>
+  <!-- Furos inferiores -->
+  <rect x="4"    y="75" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="19.2" y="75" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="34.3" y="75" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="49.5" y="75" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="64.7" y="75" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="79.8" y="75" width="11" height="12" rx="2" fill="#090c12"/>
+  <rect x="95"   y="75" width="11" height="12" rx="2" fill="#090c12"/>
+  <!-- Linhas da rede -->
+  <line x1="55" y1="45" x2="18" y2="26" stroke="rgba(78,142,186,0.5)" stroke-width="1"/>
+  <line x1="55" y1="45" x2="55" y2="24" stroke="rgba(78,142,186,0.5)" stroke-width="1"/>
+  <line x1="55" y1="45" x2="92" y2="26" stroke="rgba(78,142,186,0.5)" stroke-width="1"/>
+  <line x1="55" y1="45" x2="12" y2="45" stroke="rgba(78,142,186,0.5)" stroke-width="1"/>
+  <line x1="55" y1="45" x2="98" y2="45" stroke="rgba(78,142,186,0.5)" stroke-width="1"/>
+  <line x1="55" y1="45" x2="18" y2="64" stroke="rgba(78,142,186,0.5)" stroke-width="1"/>
+  <line x1="55" y1="45" x2="55" y2="66" stroke="rgba(78,142,186,0.5)" stroke-width="1"/>
+  <line x1="55" y1="45" x2="92" y2="64" stroke="rgba(78,142,186,0.5)" stroke-width="1"/>
+  <!-- Nós relacionados -->
+  <circle cx="18" cy="26" r="3.5" fill="#4e8eba" opacity="0.9"/><circle cx="18" cy="26" r="1.5" fill="#deeeff" opacity="0.7"/>
+  <circle cx="55" cy="24" r="3.5" fill="#4e8eba" opacity="0.9"/><circle cx="55" cy="24" r="1.5" fill="#deeeff" opacity="0.7"/>
+  <circle cx="92" cy="26" r="3.5" fill="#4e8eba" opacity="0.9"/><circle cx="92" cy="26" r="1.5" fill="#deeeff" opacity="0.7"/>
+  <circle cx="12" cy="45" r="3.5" fill="#4e8eba" opacity="0.9"/><circle cx="12" cy="45" r="1.5" fill="#deeeff" opacity="0.7"/>
+  <circle cx="98" cy="45" r="3.5" fill="#4e8eba" opacity="0.9"/><circle cx="98" cy="45" r="1.5" fill="#deeeff" opacity="0.7"/>
+  <circle cx="18" cy="64" r="3.5" fill="#4e8eba" opacity="0.9"/><circle cx="18" cy="64" r="1.5" fill="#deeeff" opacity="0.7"/>
+  <circle cx="55" cy="66" r="3.5" fill="#4e8eba" opacity="0.9"/><circle cx="55" cy="66" r="1.5" fill="#deeeff" opacity="0.7"/>
+  <circle cx="92" cy="64" r="3.5" fill="#4e8eba" opacity="0.9"/><circle cx="92" cy="64" r="1.5" fill="#deeeff" opacity="0.7"/>
+  <!-- Nó central -->
+  <circle cx="55" cy="45" r="7.5" fill="#4e8eba"/>
+  <circle cx="55" cy="45" r="3.2" fill="#deeeff"/>
+</svg>
