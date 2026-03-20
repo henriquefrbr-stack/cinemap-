@@ -33,6 +33,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<!-- Google Analytics GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
@@ -491,7 +500,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <div class="auth-err" id="auth-err"></div>
       <button class="btn-auth-submit" id="auth-submit" onclick="doAuth()">Entrar</button>
       <p class="auth-switch" id="auth-switch-txt">Não tem conta? <a onclick="switchTab('signup')">Criar conta grátis</a></p>
-      <p class="auth-terms">Ao continuar você concorda com nossos <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a></p>
+      <p class="auth-terms">Ao continuar você concorda com nossos <a href="/termos.html" target="_blank">Termos de Uso</a> e <a href="/privacidade.html" target="_blank">Política de Privacidade</a></p>
     </div>
   </div>
 </div>
