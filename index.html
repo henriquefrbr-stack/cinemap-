@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
@@ -32,7 +32,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 /* ── HEADER ── */
 #header{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(7,8,13,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px;z-index:800}
-#logo{font-family:'Inter',sans-serif;font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.3px;cursor:pointer;flex:1;user-select:none;display:flex;align-items:center;gap:10px}
+#logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.3px;cursor:pointer;flex:1;user-select:none;display:flex;align-items:center;gap:10px}
 #logo span{color:var(--accent)}
 #coin-display{font-size:13px;font-weight:500;color:var(--accent-dim);background:var(--bg-el);border:1px solid var(--border);padding:5px 12px;border-radius:20px;white-space:nowrap;transition:color .3s,border-color .3s}
 #coin-display.warn{color:var(--gold);border-color:rgba(240,192,64,.5)}
@@ -287,8 +287,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <circle cx="92" cy="64" r="3.5" fill="#4e8eba" opacity="0.9"/><circle cx="92" cy="64" r="1.5" fill="#deeeff" opacity="0.7"/>
       <circle cx="55" cy="45" r="7.5" fill="#4e8eba"/>
       <circle cx="55" cy="45" r="3.2" fill="#deeeff"/>
-    </svg>
-    Cine<span>map</span>
+    </svg><span>Cine<span style="color:var(--accent)">map</span></span>
   </div>
   <div id="coin-display">🪙 3/3</div>
   <div id="auth-btns">
