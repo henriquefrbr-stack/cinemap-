@@ -444,7 +444,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
-        <a href="#" class="auth-forgot" id="auth-forgot-lnk" onclick="return false;">Esqueci minha senha</a>
+        <a href="#" class="auth-forgot" id="auth-forgot-lnk" onclick="doForgotPassword();return false;">Esqueci minha senha</a>
       </div>
       <div class="auth-err" id="auth-err"></div>
       <button class="btn-auth-submit" id="auth-submit" onclick="doAuth()">Entrar</button>
@@ -1364,6 +1364,27 @@ function switchTab(mode) {
   }
 }
 
+async function doForgotPassword() {
+  const email = $('auth-email').value.trim();
+  if (!email) {
+    $('auth-err').style.color = 'var(--danger)';
+    $('auth-err').textContent = 'Digite seu email acima primeiro.';
+    return;
+  }
+  $('auth-forgot-lnk').textContent = 'Enviando...';
+  const { error } = await _supa.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://www.cinemap.com.br/?reset=true'
+  });
+  $('auth-forgot-lnk').textContent = 'Esqueci minha senha';
+  if (error) {
+    $('auth-err').style.color = 'var(--danger)';
+    $('auth-err').textContent = 'Não foi possível enviar o email. Tente novamente.';
+  } else {
+    $('auth-err').style.color = 'var(--success)';
+    $('auth-err').textContent = '✓ Email enviado! Verifique sua caixa de entrada.';
+  }
+}
+
 function toggleAuthPwd() {
   const inp = $('auth-password');
   const isHidden = inp.type === 'password';
@@ -1454,9 +1475,50 @@ async function doLogout() {
 
 // Ouvir mudanças de sessão
 _supa.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN')  setUser(session, true);
-  if (event === 'SIGNED_OUT') setUser(null, false);
+  if (event === 'SIGNED_IN')        setUser(session, true);
+  if (event === 'SIGNED_OUT')       setUser(null, false);
+  if (event === 'PASSWORD_RECOVERY') openResetModal();
 });
+
+function openResetModal() {
+  $('auth-title').textContent    = 'Nova senha';
+  $('auth-subtitle').textContent = 'Digite e confirme sua nova senha';
+  $('auth-email').style.display  = 'none';
+  $('auth-forgot-lnk').style.display = 'none';
+  $('auth-switch-txt').style.display = 'none';
+  $('auth-submit').textContent   = 'Salvar nova senha';
+  $('auth-submit').onclick       = doResetPassword;
+  openModal('auth-modal');
+}
+
+async function doResetPassword() {
+  const password = $('auth-password').value.trim();
+  if (!password || password.length < 6) {
+    $('auth-err').style.color = 'var(--danger)';
+    $('auth-err').textContent = 'A senha deve ter pelo menos 6 caracteres.';
+    return;
+  }
+  $('auth-submit').textContent = 'Salvando...';
+  $('auth-submit').disabled = true;
+  const { error } = await _supa.auth.updateUser({ password });
+  $('auth-submit').disabled = false;
+  if (error) {
+    $('auth-err').style.color = 'var(--danger)';
+    $('auth-err').textContent = 'Erro ao salvar. Tente novamente.';
+    $('auth-submit').textContent = 'Salvar nova senha';
+  } else {
+    $('auth-err').style.color = 'var(--success)';
+    $('auth-err').textContent = '✓ Senha atualizada com sucesso!';
+    setTimeout(() => {
+      closeModal('auth-modal');
+      // restaura o modal para o estado normal
+      $('auth-email').style.display = '';
+      $('auth-switch-txt').style.display = '';
+      $('auth-submit').onclick = doAuth;
+      switchTab('login');
+    }, 1500);
+  }
+}
 
 // Restaurar sessão ao carregar a página (sem toast)
 _supa.auth.getSession().then(({ data }) => { if (data.session) setUser(data.session, false); });
