@@ -1,0 +1,85 @@
+<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#1a2a3a"/>
+      <stop offset="100%" stop-color="#07080d"/>
+    </radialGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7eb8f7"/>
+      <stop offset="100%" stop-color="#3d7aad"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid lines -->
+  <line x1="0" y1="210" x2="1200" y2="210" stroke="#1e2433" stroke-width="1"/>
+  <line x1="0" y1="420" x2="1200" y2="420" stroke="#1e2433" stroke-width="1"/>
+  <line x1="400" y1="0" x2="400" y2="630" stroke="#1e2433" stroke-width="1"/>
+  <line x1="800" y1="0" x2="800" y2="630" stroke="#1e2433" stroke-width="1"/>
+
+  <!-- Film strip left decoration -->
+  <rect x="60" y="200" width="140" height="230" rx="6" fill="#1a2a3a"/>
+  <rect x="65" y="200" width="130" height="230" fill="#0d1520" stroke="#3d7aad" stroke-width="1"/>
+  <!-- holes left -->
+  <rect x="60" y="208" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="60" y="238" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="60" y="268" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="60" y="298" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="60" y="328" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="60" y="358" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="60" y="388" width="14" height="20" rx="3" fill="#07080d"/>
+  <!-- holes right -->
+  <rect x="186" y="208" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="186" y="238" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="186" y="268" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="186" y="298" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="186" y="328" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="186" y="358" width="14" height="20" rx="3" fill="#07080d"/>
+  <rect x="186" y="388" width="14" height="20" rx="3" fill="#07080d"/>
+
+  <!-- Network nodes decoration (right side) -->
+  <!-- Lines -->
+  <line x1="950" y1="315" x2="870" y2="230" stroke="rgba(78,142,186,0.4)" stroke-width="1.5"/>
+  <line x1="950" y1="315" x2="1050" y2="220" stroke="rgba(78,142,186,0.4)" stroke-width="1.5"/>
+  <line x1="950" y1="315" x2="1080" y2="340" stroke="rgba(78,142,186,0.4)" stroke-width="1.5"/>
+  <line x1="950" y1="315" x2="1040" y2="420" stroke="rgba(78,142,186,0.4)" stroke-width="1.5"/>
+  <line x1="950" y1="315" x2="840" y2="400" stroke="rgba(78,142,186,0.4)" stroke-width="1.5"/>
+  <line x1="950" y1="315" x2="870" y2="170" stroke="rgba(78,142,186,0.25)" stroke-width="1"/>
+  <line x1="950" y1="315" x2="1100" y2="280" stroke="rgba(78,142,186,0.25)" stroke-width="1"/>
+  <!-- Outer nodes -->
+  <circle cx="870" cy="230" r="18" fill="#4e8eba" opacity="0.8"/>
+  <circle cx="870" cy="230" r="8" fill="#deeeff" opacity="0.9"/>
+  <circle cx="1050" cy="220" r="14" fill="#4e8eba" opacity="0.7"/>
+  <circle cx="1050" cy="220" r="6" fill="#deeeff" opacity="0.8"/>
+  <circle cx="1080" cy="340" r="16" fill="#4e8eba" opacity="0.75"/>
+  <circle cx="1080" cy="340" r="7" fill="#deeeff" opacity="0.85"/>
+  <circle cx="1040" cy="420" r="12" fill="#4e8eba" opacity="0.65"/>
+  <circle cx="1040" cy="420" r="5" fill="#deeeff" opacity="0.75"/>
+  <circle cx="840" cy="400" r="15" fill="#4e8eba" opacity="0.7"/>
+  <circle cx="840" cy="400" r="6" fill="#deeeff" opacity="0.8"/>
+  <circle cx="870" cy="170" r="10" fill="#4e8eba" opacity="0.5"/>
+  <circle cx="870" cy="170" r="4" fill="#deeeff" opacity="0.6"/>
+  <circle cx="1100" cy="280" r="11" fill="#4e8eba" opacity="0.55"/>
+  <circle cx="1100" cy="280" r="4" fill="#deeeff" opacity="0.65"/>
+  <!-- Center node (glow) -->
+  <circle cx="950" cy="315" r="38" fill="#4e8eba" opacity="0.15" filter="url(#glow)"/>
+  <circle cx="950" cy="315" r="28" fill="#4e8eba" opacity="0.9"/>
+  <circle cx="950" cy="315" r="12" fill="#deeeff"/>
+
+  <!-- Logo text -->
+  <text font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="108" y="370" x="280" text-anchor="middle">
+    <tspan fill="#c8d6e5">Cine</tspan><tspan fill="#4e8eba">map</tspan>
+  </text>
+
+  <!-- Tagline -->
+  <text font-family="'Helvetica Neue', Arial, sans-serif" font-weight="400" font-size="32" fill="#7a8495" y="420" x="280" text-anchor="middle">Explore o universo do cinema</text>
+
+  <!-- URL -->
+  <text font-family="'Helvetica Neue', Arial, sans-serif" font-weight="500" font-size="24" fill="#3d7aad" y="520" x="280" text-anchor="middle">cinemap.com.br</text>
+</svg>
