@@ -256,9 +256,9 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .auth-terms a{color:#4a5468;text-decoration:underline}
 
 /* ── COIN MOBILE PILL ── */
-#coin-mobile{display:none;position:fixed;bottom:24px;left:20px;z-index:10;background:rgba(13,15,23,.92);border:1px solid var(--border);border-radius:20px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--accent-dim);backdrop-filter:blur(6px);cursor:pointer;transition:border-color .2s,color .2s;white-space:nowrap;user-select:none}
-#coin-mobile:hover{border-color:var(--accent-dim);color:var(--text)}
-#coin-mobile.warn{color:var(--gold);border-color:rgba(240,192,64,.4)}
+#coin-mobile{display:none;position:fixed;bottom:24px;left:20px;z-index:10;background:rgba(13,15,23,.92);border:1px solid rgba(240,192,64,.35);border-radius:20px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--gold);backdrop-filter:blur(6px);cursor:pointer;transition:border-color .2s,color .2s;white-space:nowrap;user-select:none}
+#coin-mobile:hover{border-color:var(--gold);color:#f5d060}
+#coin-mobile.warn{border-color:rgba(240,82,82,.5);color:var(--danger)}
 
 /* ── RESPONSIVE ── */
 @media(max-width:640px){
@@ -271,7 +271,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   .plans-grid{grid-template-columns:1fr}
   .hero h1{font-size:38px}
   .hero p{font-size:15px}
-  #shuffle-btn{display:none!important}
   #net-coins{display:none}
 }
 @media(max-width:480px){
@@ -739,7 +738,7 @@ async function doCancel() {
 function syncShuffleBtn() {
   const btn = $('shuffle-btn');
   const n = S.shuffleLeft;
-  btn.textContent = `Me indique outros filmes (${n})`;
+  btn.textContent = window.innerWidth <= 640 ? `↻ (${n})` : `Me indique outros filmes (${n})`;
   btn.disabled = n <= 0;
   btn.style.opacity = n <= 0 ? '0.4' : '';
   btn.style.cursor  = n <= 0 ? 'not-allowed' : '';
