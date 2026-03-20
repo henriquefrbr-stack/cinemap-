@@ -1757,9 +1757,8 @@ async function setUser(session, showToast=false) {
   closeModal('auth-modal');
   closeModal('gate-modal');
   syncCoins();
-  await loadWatchlist();
-  renderWLPreview();
   if (showToast) toast('✅ Login realizado!', 'ok');
+  loadWatchlist().then(() => renderWLPreview()); // não bloqueia
 }
 
 async function doLogout() {
@@ -1770,9 +1769,14 @@ async function doLogout() {
 }
 
 // Ouvir mudanças de sessão
+// _initialSession flag evita toast e double-call no page load
+let _initialSession = true;
 _supa.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN')        setUser(session, true);
-  if (event === 'SIGNED_OUT')       setUser(null, false);
+  if (event === 'SIGNED_IN') {
+    // No page load o getSession já chama setUser(false); aqui só tratamos login real
+    if (!_initialSession) setUser(session, true);
+  }
+  if (event === 'SIGNED_OUT')        setUser(null, false);
   if (event === 'PASSWORD_RECOVERY') openResetModal();
 });
 
@@ -1817,7 +1821,10 @@ async function doResetPassword() {
 }
 
 // Restaurar sessão ao carregar a página (sem toast)
-_supa.auth.getSession().then(({ data }) => { if (data.session) setUser(data.session, false); });
+_supa.auth.getSession().then(({ data }) => {
+  _initialSession = false;
+  if (data.session) setUser(data.session, false);
+});
 
 // ─────────────────────────────────────────
 // CONFIG (modal secreto)
