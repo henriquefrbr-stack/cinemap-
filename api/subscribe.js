@@ -17,40 +17,37 @@ export default async function handler(req, res) {
   const { data: { user }, error } = await supabase.auth.getUser(token);
   if (error || !user) return res.status(401).json({ error: 'invalid token' });
 
-  const isSandbox = process.env.MP_ACCESS_TOKEN?.startsWith('TEST-');
-  const baseUrl   = process.env.APP_URL || 'https://cinemap-nl99.vercel.app';
+  const baseUrl = process.env.APP_URL || 'https://www.cinemap.com.br';
 
-  const preference = {
-    items: [{
-      title: 'Cinemap Premium',
-      description: '999 moedas por dia para explorar o universo do cinema',
-      quantity: 1,
-      currency_id: 'BRL',
-      unit_price: 19.90
-    }],
-    payer: { email: user.email },
-    back_urls: {
-      success: `${baseUrl}/?payment=success`,
-      failure: `${baseUrl}/?payment=failure`,
-      pending: `${baseUrl}/?payment=pending`
-    },
-    auto_return: 'approved',
+  // MP exige start_date no futuro
+  const startDate = new Date(Date.now() + 60 * 1000).toISOString();
+
+  const subscription = {
+    reason: 'Cinemap Premium',
     external_reference: user.id,
-    notification_url: `${baseUrl}/api/mp-webhook`
+    payer_email: user.email,
+    auto_recurring: {
+      frequency: 1,
+      frequency_type: 'months',
+      transaction_amount: 19.90,
+      currency_id: 'BRL',
+      start_date: startDate
+    },
+    back_url: `${baseUrl}/?payment=success`,
+    status: 'pending'
   };
 
-  const r = await fetch('https://api.mercadopago.com/checkout/preferences', {
+  const r = await fetch('https://api.mercadopago.com/preapproval', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(preference)
+    body: JSON.stringify(subscription)
   });
 
   const data = await r.json();
   if (!r.ok) return res.status(500).json({ error: 'mp_error', details: data });
 
-  const url = isSandbox ? data.sandbox_init_point : data.init_point;
-  return res.status(200).json({ checkout_url: url });
+  return res.status(200).json({ checkout_url: data.init_point });
 }
