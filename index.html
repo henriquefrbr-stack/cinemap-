@@ -257,19 +257,30 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 /* ── RESPONSIVE ── */
 @media(max-width:640px){
-  #header{padding:0 14px;gap:10px}
-  #logo{font-size:18px}
+  #header{padding:0 12px;gap:8px}
+  #logo{font-size:17px}
   .btn{padding:6px 10px;font-size:12px}
-  #coin-display{font-size:12px;padding:5px 10px}
+  #coin-display{font-size:12px;padding:4px 9px}
+  #btn-plans-hdr{display:none!important}
   .plans-grid{grid-template-columns:1fr}
   .hero h1{font-size:38px}
   .hero p{font-size:15px}
+  /* Network bar: só essencial */
+  #shuffle-btn{display:none!important}
+  #net-coins{display:none}
 }
 @media(max-width:480px){
-  #net-bar{padding:0 12px;gap:10px}
+  /* Header: hide logo text, user email — só ícone + moedas + botão */
+  #logo span{display:none}
+  #logo{flex:0 0 auto;gap:0}
+  #user-info{display:none!important}
+  #coin-display{background:transparent;border:none;padding:4px 6px;font-size:13px;font-weight:600}
+  #auth-btns{gap:6px}
+  /* Network bar */
+  #net-bar{padding:0 10px;gap:8px}
   #net-title{font-size:13px}
-  #bs-inner{gap:14px;padding:16px 16px 8px}
-  #bs-footer{padding:10px 16px 4px}
+  #bs-inner{gap:12px;padding:14px 14px 6px}
+  #bs-footer{padding:10px 14px 4px}
 }
 </style>
 </head>
@@ -320,7 +331,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div id="user-info" style="display:none"></div>
     <button class="btn" id="btn-logout" style="display:none" onclick="doLogout()">Sair</button>
     <button class="btn" id="btn-login" onclick="openModal('auth-modal')">Entrar</button>
-    <button class="btn" onclick="showView('plans')">Ver Planos</button>
+    <button class="btn" id="btn-plans-hdr" onclick="showView('plans')">Ver Planos</button>
   </div>
 </header>
 
