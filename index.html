@@ -255,21 +255,60 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .auth-terms{text-align:center;font-size:11px;color:#3a4152;line-height:1.6}
 .auth-terms a{color:#4a5468;text-decoration:underline}
 
+/* ── WATCHLIST VIEW ── */
+#watchlist-view{min-height:100vh;padding-top:60px}
+.wl-wrap{max-width:920px;width:100%;padding:48px 24px;margin:0 auto}
+.wl-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.wl-hd h2{font-size:28px;font-weight:800}
+.wl-empty{text-align:center;padding:80px 24px;color:var(--text-dim)}
+.wl-empty-icon{font-size:48px;margin-bottom:16px}
+.wl-empty p{font-size:16px;margin-top:8px;line-height:1.6}
+.wl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px}
+.wl-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s;position:relative}
+.wl-card:hover{border-color:var(--accent-dim);transform:translateY(-2px)}
+.wl-poster{width:100%;aspect-ratio:2/3;object-fit:cover;display:block}
+.wl-poster-ph{width:100%;aspect-ratio:2/3;display:flex;align-items:center;justify-content:center;background:var(--bg-el);font-size:32px}
+.wl-info{padding:8px 10px 10px}
+.wl-title{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wl-meta{font-size:11px;color:var(--text-dim);margin-top:3px;display:flex;justify-content:space-between}
+.wl-remove{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(7,8,13,.8);border:1px solid var(--border);color:var(--text-dim);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;line-height:1}
+.wl-card:hover .wl-remove{opacity:1}
+.wl-remove:hover{color:var(--danger);border-color:rgba(224,82,82,.5)}
+/* Home watchlist preview */
+.wl-preview{max-width:540px;width:100%;margin-top:32px}
+.wl-preview-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.wl-preview-hd span{font-size:13px;font-weight:600;color:var(--text-dim)}
+.wl-preview-hd a{font-size:12px;color:var(--accent);cursor:pointer;text-decoration:none}
+.wl-preview-hd a:hover{text-decoration:underline}
+.wl-preview-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.wl-preview-row::-webkit-scrollbar{display:none}
+.wl-mini{width:56px;flex-shrink:0;cursor:pointer}
+.wl-mini img,.wl-mini-ph{width:56px;height:84px;border-radius:6px;object-fit:cover;display:block;background:var(--bg-el);display:flex;align-items:center;justify-content:center;font-size:20px}
+.wl-mini img{background:none;display:block}
+
 /* ── RESPONSIVE ── */
 @media(max-width:640px){
-  #header{padding:0 14px;gap:10px}
+  #header{padding:0 14px;gap:8px}
   #logo{font-size:18px}
   .btn{padding:6px 10px;font-size:12px}
-  #coin-display{font-size:12px;padding:5px 10px}
+  #coin-display{font-size:12px;padding:5px 9px}
+  #btn-plans-hdr{display:none!important}
+  #btn-watchlist-hdr{display:none!important}
   .plans-grid{grid-template-columns:1fr}
   .hero h1{font-size:38px}
   .hero p{font-size:15px}
+  /* Network bar: hide secondary actions, keep essentials */
+  #shuffle-btn{display:none!important}
+  #net-share-btn{display:none!important}
+  #net-coins{display:none}
+  .wl-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
 }
 @media(max-width:480px){
-  #net-bar{padding:0 12px;gap:10px}
+  #net-bar{padding:0 10px;gap:8px}
   #net-title{font-size:13px}
+  #user-info{max-width:72px;font-size:11px}
   #bs-inner{gap:14px;padding:16px 16px 8px}
-  #bs-footer{padding:10px 16px 4px}
+  #bs-footer{padding:10px 16px 4px;gap:8px}
 }
 </style>
 </head>
@@ -318,9 +357,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <div id="coin-display">🪙 3/3</div>
   <div id="auth-btns">
     <div id="user-info" style="display:none"></div>
+    <button class="btn" id="btn-watchlist-hdr" style="display:none" onclick="showView('watchlist')">♡ Lista</button>
     <button class="btn" id="btn-logout" style="display:none" onclick="doLogout()">Sair</button>
     <button class="btn" id="btn-login" onclick="openModal('auth-modal')">Entrar</button>
-    <button class="btn" onclick="showView('plans')">Ver Planos</button>
+    <button class="btn" id="btn-plans-hdr" onclick="showView('plans')">Ver Planos</button>
   </div>
 </header>
 
@@ -338,6 +378,29 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <div id="ac-drop"></div>
     </div>
     <div class="chips" id="chips"></div>
+    <div class="wl-preview" id="wl-preview" style="display:none">
+      <div class="wl-preview-hd">
+        <span>♡ Sua lista</span>
+        <a onclick="showView('watchlist')">Ver tudo →</a>
+      </div>
+      <div class="wl-preview-row" id="wl-preview-row"></div>
+    </div>
+  </div>
+</div>
+
+<!-- WATCHLIST VIEW -->
+<div id="watchlist-view" class="view">
+  <div class="wl-wrap">
+    <div class="wl-hd">
+      <h2>♡ Minha Lista</h2>
+      <button class="btn" onclick="showView('home')">← Voltar</button>
+    </div>
+    <div id="wl-empty" class="wl-empty" style="display:none">
+      <div class="wl-empty-icon">🎬</div>
+      <strong>Sua lista está vazia</strong>
+      <p>Salve filmes pelo botão "Salvar" ao tocar em um nó da rede.</p>
+    </div>
+    <div class="wl-grid" id="wl-grid"></div>
   </div>
 </div>
 
@@ -352,7 +415,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
     <span id="net-coins">🪙 5/5</span>
     <button class="btn" id="shuffle-btn">Me indique outros filmes (3)</button>
-    <button class="btn" onclick="doShare()">Compartilhar</button>
+    <button class="btn" id="net-share-btn" onclick="doShare()">Compartilhar</button>
   </div>
   <svg id="net-svg"></svg>
   <div id="zoom-ctrls">
@@ -535,7 +598,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
   </div>
   <div id="bs-footer">
-    <button class="btn btn-primary" id="bs-explore">Explorar conexões →</button>
+    <button class="btn" id="bs-save" onclick="toggleWatchlistBS()" style="flex-shrink:0">♡ Salvar</button>
+    <button class="btn btn-primary" id="bs-explore">Explorar →</button>
   </div>
 </div>
 
@@ -594,6 +658,7 @@ const S = {
   user             : null,
   token            : null,
   plan             : 'free',
+  watchlist        : {}, // movie_id → movie_data
 };
 
 if (sessionStorage.getItem('cm_guest_coins') === null) {
@@ -617,7 +682,8 @@ function showView(name) {
   $(name+'-view').classList.add('active');
   S.view = name;
   $('header').style.display = name === 'network' ? 'none' : 'flex';
-  if (name === 'home') { $('search-input').value=''; closeAC(); }
+  if (name === 'home') { $('search-input').value=''; closeAC(); renderWLPreview(); }
+  if (name === 'watchlist') renderWatchlist();
 }
 
 // ─────────────────────────────────────────
@@ -1306,6 +1372,9 @@ function openBS(movie, canExplore) {
   // Show/hide explore button
   $('bs-explore').style.display = canExplore ? '' : 'none';
 
+  // Watchlist button
+  updateBSSave(movie);
+
   $('bs-bg').classList.add('on');
   $('bs').classList.add('on');
 }
@@ -1429,6 +1498,128 @@ async function shuffleNetwork() {
 $('shuffle-btn').addEventListener('click', shuffleNetwork);
 
 // ─────────────────────────────────────────
+// WATCHLIST
+// ─────────────────────────────────────────
+function isInWL(id) { return !!S.watchlist[id]; }
+
+async function loadWatchlist() {
+  if (!S.user) return;
+  try {
+    const r = await fetch('/api/watchlist', { headers: { 'Authorization': `Bearer ${S.token}` } });
+    if (r.ok) {
+      const d = await r.json();
+      S.watchlist = {};
+      (d.items || []).forEach(item => { S.watchlist[item.movie_id] = item.movie_data; });
+    }
+  } catch(e) {}
+}
+
+async function toggleWatchlist(movie) {
+  if (!S.user) {
+    switchTab('signup');
+    openModal('auth-modal');
+    toast('Crie uma conta para salvar filmes.', 'warn');
+    return;
+  }
+  const id = movie.id;
+  if (isInWL(id)) {
+    delete S.watchlist[id];
+    updateBSSave(movie);
+    try {
+      await fetch('/api/watchlist', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${S.token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movie_id: id })
+      });
+    } catch(e) {}
+    toast('Removido da lista.', '');
+  } else {
+    S.watchlist[id] = { id: movie.id, title: movie.title, release_date: movie.release_date, poster_path: movie.poster_path, vote_average: movie.vote_average };
+    updateBSSave(movie);
+    try {
+      await fetch('/api/watchlist', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${S.token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movie })
+      });
+    } catch(e) {}
+    toast('✓ Salvo na sua lista!', 'ok');
+  }
+  if (S.view === 'watchlist') renderWatchlist();
+  renderWLPreview();
+}
+
+function toggleWatchlistBS() { if (S.bsMovie) toggleWatchlist(S.bsMovie); }
+
+function updateBSSave(movie) {
+  const btn = $('bs-save');
+  if (!btn || !movie) return;
+  const saved = isInWL(movie.id);
+  btn.textContent = saved ? '✓ Na lista' : '♡ Salvar';
+  btn.style.color = saved ? 'var(--success)' : '';
+  btn.style.borderColor = saved ? 'rgba(82,200,120,.4)' : '';
+}
+
+async function removeFromWL(movieId) {
+  delete S.watchlist[movieId];
+  renderWatchlist();
+  renderWLPreview();
+  try {
+    await fetch('/api/watchlist', {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${S.token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ movie_id: movieId })
+    });
+  } catch(e) {}
+}
+
+function renderWatchlist() {
+  const items = Object.values(S.watchlist);
+  const grid  = $('wl-grid');
+  const empty = $('wl-empty');
+  if (!grid) return;
+  if (!items.length) { grid.innerHTML=''; grid.style.display='none'; empty.style.display=''; return; }
+  grid.style.display=''; empty.style.display='none';
+  grid.innerHTML = '';
+  items.forEach(movie => {
+    const card = document.createElement('div');
+    card.className = 'wl-card';
+    const y = movie.release_date ? movie.release_date.slice(0,4) : '—';
+    card.innerHTML = `
+      ${movie.poster_path
+        ? `<img class="wl-poster" src="${W185}${movie.poster_path}" alt="" loading="lazy">`
+        : `<div class="wl-poster-ph">🎬</div>`}
+      <div class="wl-info">
+        <div class="wl-title">${movie.title}</div>
+        <div class="wl-meta"><span>${y}</span>${movie.vote_average ? `<span>★ ${movie.vote_average.toFixed(1)}</span>` : ''}</div>
+      </div>
+      <button class="wl-remove" title="Remover" onclick="event.stopPropagation();removeFromWL(${movie.id})">✕</button>`;
+    card.addEventListener('click', async () => { if (!await spendCoin()) return; await loadNetwork(movie); });
+    grid.appendChild(card);
+  });
+}
+
+function renderWLPreview() {
+  const preview = $('wl-preview');
+  const row = $('wl-preview-row');
+  if (!preview || !row || !S.user) { if(preview) preview.style.display='none'; return; }
+  const items = Object.values(S.watchlist).slice(0, 8);
+  if (!items.length) { preview.style.display='none'; return; }
+  preview.style.display='';
+  row.innerHTML = '';
+  items.forEach(movie => {
+    const el = document.createElement('div');
+    el.className = 'wl-mini';
+    el.title = movie.title;
+    el.innerHTML = movie.poster_path
+      ? `<img src="${W185}${movie.poster_path}" alt="" loading="lazy">`
+      : `<div class="wl-mini-ph">🎬</div>`;
+    el.addEventListener('click', async () => { if (!await spendCoin()) return; await loadNetwork(movie); });
+    row.appendChild(el);
+  });
+}
+
+// ─────────────────────────────────────────
 // AUTH
 // ─────────────────────────────────────────
 let _authMode = 'login';
@@ -1531,9 +1722,12 @@ async function setUser(session, showToast=false) {
     S.user  = null;
     S.token = null;
     S.coins = +(sessionStorage.getItem('cm_guest_coins') ?? GUEST_MAX);
-    $('user-info').style.display  = 'none';
-    $('btn-logout').style.display = 'none';
-    $('btn-login').style.display  = '';
+    $('user-info').style.display         = 'none';
+    $('btn-logout').style.display        = 'none';
+    $('btn-watchlist-hdr').style.display = 'none';
+    $('btn-login').style.display         = '';
+    S.watchlist = {};
+    renderWLPreview();
     syncCoins();
     return;
   }
@@ -1555,13 +1749,16 @@ async function setUser(session, showToast=false) {
     S.coins = MAX_C;
   }
   syncPlan();
-  $('user-info').textContent    = S.user.email.split('@')[0];
-  $('user-info').style.display  = '';
-  $('btn-logout').style.display = '';
-  $('btn-login').style.display  = 'none';
+  $('user-info').textContent        = S.user.email.split('@')[0];
+  $('user-info').style.display      = '';
+  $('btn-logout').style.display     = '';
+  $('btn-watchlist-hdr').style.display = '';
+  $('btn-login').style.display      = 'none';
   closeModal('auth-modal');
   closeModal('gate-modal');
   syncCoins();
+  await loadWatchlist();
+  renderWLPreview();
   if (showToast) toast('✅ Login realizado!', 'ok');
 }
 
