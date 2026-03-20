@@ -12,6 +12,7 @@ export default async function handler(req, res) {
   if (!data?.id) return res.status(200).end();
 
   let userId = null;
+  let subscriptionId = null;
 
   // Pagamento único (fallback)
   if (type === 'payment') {
@@ -31,12 +32,17 @@ export default async function handler(req, res) {
     });
     if (r.ok) {
       const preapproval = await r.json();
-      if (preapproval.status === 'authorized') userId = preapproval.external_reference;
+      if (preapproval.status === 'authorized') {
+        userId = preapproval.external_reference;
+        subscriptionId = data.id;
+      }
     }
   }
 
   if (userId) {
-    await supabase.from('profiles').update({ plan: 'premium' }).eq('id', userId);
+    const update = { plan: 'premium' };
+    if (subscriptionId) update.mp_subscription_id = subscriptionId;
+    await supabase.from('profiles').update(update).eq('id', userId);
   }
 
   return res.status(200).end();

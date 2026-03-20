@@ -363,10 +363,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
           <li class="off">Moedas ilimitadas</li>
           <li class="off">Suporte prioritário</li>
         </ul>
-        <button class="btn" style="width:100%;padding:12px;font-size:14px">Plano atual</button>
+        <button class="btn" id="btn-basic-plan" style="width:100%;padding:12px;font-size:14px">Plano atual</button>
       </div>
-      <div class="plan-card featured">
-        <div class="plan-badge">Mais Popular</div>
+      <div class="plan-card featured" id="card-premium">
+        <div class="plan-badge" id="plan-badge">Mais Popular</div>
         <div class="plan-name">Premium</div>
         <div class="plan-price"><sup>R$</sup>9<small>,90/mês</small></div>
         <div class="plan-period">Cobrado mensalmente · cancele quando quiser</div>
@@ -378,7 +378,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
           <li>Moedas praticamente ilimitadas</li>
           <li>Suporte prioritário</li>
         </ul>
-        <button class="btn btn-primary" style="width:100%;padding:12px;font-size:14px" onclick="doSubscribe()">Assinar Premium</button>
+        <button class="btn btn-primary" id="btn-premium-plan" style="width:100%;padding:12px;font-size:14px" onclick="doSubscribe()">Assinar Premium</button>
+        <button class="btn" id="btn-cancel-plan" style="width:100%;padding:10px;font-size:13px;margin-top:8px;display:none;color:var(--danger);border-color:rgba(224,82,82,.3)" onclick="openModal('cancel-modal')">Cancelar assinatura</button>
       </div>
     </div>
     <div style="text-align:center;margin-top:32px">
@@ -513,6 +514,19 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   </div>
 </div>
 
+<!-- CANCEL MODAL -->
+<div class="overlay" id="cancel-modal">
+  <div class="modal" style="max-width:400px">
+    <button class="modal-x" onclick="closeModal('cancel-modal')">✕</button>
+    <h3 style="margin-bottom:10px">Cancelar assinatura</h3>
+    <p>Você perderá acesso às <strong>999 moedas diárias</strong> e voltará para o plano gratuito (5 moedas/dia). Tem certeza?</p>
+    <div style="display:flex;gap:10px;margin-top:22px">
+      <button class="btn" style="flex:1;padding:12px" onclick="closeModal('cancel-modal')">Manter Premium</button>
+      <button class="btn" style="flex:1;padding:12px;color:var(--danger);border-color:rgba(224,82,82,.3)" id="btn-confirm-cancel" onclick="doCancel()">Sim, cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOASTS -->
 <div id="toasts"></div>
 
@@ -554,6 +568,7 @@ const S = {
   shownMovieTitles : [],
   user             : null,
   token            : null,
+  plan             : 'free',
 };
 
 if (sessionStorage.getItem('cm_guest_coins') === null) {
@@ -628,6 +643,54 @@ async function spendCoin() {
 }
 
 syncCoins();
+
+function syncPlan() {
+  const isPremium = S.plan === 'premium';
+  const btnBasic   = $('btn-basic-plan');
+  const btnPremium = $('btn-premium-plan');
+  const btnCancel  = $('btn-cancel-plan');
+  const badge      = $('plan-badge');
+  if (!btnBasic) return;
+  if (isPremium) {
+    btnBasic.textContent   = 'Fazer downgrade';
+    btnPremium.textContent = '✓ Plano atual';
+    btnPremium.disabled    = true;
+    btnPremium.style.opacity = '.6';
+    btnCancel.style.display  = '';
+    badge.textContent = '✓ Seu plano';
+  } else {
+    btnBasic.textContent   = 'Plano atual';
+    btnPremium.textContent = 'Assinar Premium';
+    btnPremium.disabled    = false;
+    btnPremium.style.opacity = '';
+    btnCancel.style.display  = 'none';
+    badge.textContent = 'Mais Popular';
+  }
+}
+
+async function doCancel() {
+  $('btn-confirm-cancel').textContent = 'Cancelando...';
+  $('btn-confirm-cancel').disabled    = true;
+  try {
+    const r = await fetch('/api/cancel', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${S.token}`, 'Content-Type': 'application/json' }
+    });
+    if (r.ok) {
+      S.plan = 'free';
+      syncPlan();
+      closeModal('cancel-modal');
+      toast('Assinatura cancelada. Você voltou ao plano gratuito.', 'warn');
+    } else {
+      toast('Erro ao cancelar. Tente novamente.', 'err');
+    }
+  } catch(e) {
+    toast('Erro ao cancelar. Tente novamente.', 'err');
+  } finally {
+    $('btn-confirm-cancel').textContent = 'Sim, cancelar';
+    $('btn-confirm-cancel').disabled    = false;
+  }
+}
 
 function syncShuffleBtn() {
   const btn = $('shuffle-btn');
@@ -1459,12 +1522,14 @@ async function setUser(session, showToast=false) {
     if (r.ok) {
       const data = await r.json();
       S.coins = data.coins ?? MAX_C;
+      S.plan  = data.plan  ?? 'free';
     } else {
       S.coins = MAX_C;
     }
   } catch(e) {
     S.coins = MAX_C;
   }
+  syncPlan();
   $('user-info').textContent    = S.user.email.split('@')[0];
   $('user-info').style.display  = '';
   $('btn-logout').style.display = '';
