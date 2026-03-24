@@ -1147,8 +1147,9 @@ function buildGraph(center, related) {
     });
   }
 
-  // drag
+  // drag — clickDistance evita que cliques simples sejam interpretados como drag
   const drag = sim => d3.drag()
+    .clickDistance(5)
     .on('start', (ev,d)=>{ if(!ev.active) sim.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; })
     .on('drag',  (ev,d)=>{ d.fx=ev.x; d.fy=ev.y; })
     .on('end',   (ev,d)=>{ if(!ev.active) sim.alphaTarget(0); if(d.type!=='c'){d.fx=null;d.fy=null;} });
