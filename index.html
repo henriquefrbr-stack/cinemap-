@@ -770,12 +770,12 @@ async function spendCoin() {
       if (r.status === 402) { S.coins = 0; syncCoins(); openModal('nocoins-modal'); return false; }
       if (r.ok) {
         const data = await r.json();
-        S.coins = data.coins; // servidor é a fonte da verdade
+        S.coins = data.coins;
       } else {
-        return false; // falha no servidor → não debita local
+        S.coins--; // fallback local se servidor falhar
       }
     } catch(e) {
-      return false; // erro de rede → não debita local
+      S.coins--; // fallback local se rede falhar
     }
   } else {
     // Convidado: debita local
@@ -1338,12 +1338,8 @@ function buildGraph(center, related) {
     }
   });
 
-  // fade-in dos nós após a simulação estabilizar um pouco
-  sim.on('end', () => {
-    nodeG.transition().duration(600).attr('opacity', 1);
-  });
-  // fallback: garante visibilidade após 1.5s caso 'end' demore
-  setTimeout(() => nodeG.transition().duration(400).attr('opacity', 1), 1500);
+  // fade-in rápido — nós visíveis em 150ms
+  setTimeout(() => nodeG.transition().duration(500).attr('opacity', 1), 150);
 
   // zoom buttons
   $('z-in').onclick  = ()=> svg.transition().duration(300).call(zoom.scaleBy,1.5);
@@ -1800,7 +1796,8 @@ window.addEventListener('popstate', async (ev) => {
     try {
       const d = await apiFetch(`/movie/${ev.state.movieId}`);
       if (d?.id) { await loadNetwork(d); }
-    } catch(e) { hideLoad(); }
+    } catch(e) {}
+    finally { hideLoad(); }
   } else {
     if (S.sim) S.sim.stop();
     document.title = 'Cinemap: Descubra filmes e explore o universo do cinema';
@@ -1821,7 +1818,8 @@ window.addEventListener('popstate', async (ev) => {
     try {
       const d = await apiFetch(`/movie/${movieId}`);
       if (d?.id) await loadNetwork(d);
-    } catch(e) { hideLoad(); }
+    } catch(e) {}
+    finally { hideLoad(); }
   }
 })();
 
