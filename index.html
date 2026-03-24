@@ -1092,6 +1092,12 @@ async function loadNetwork(movie) {
 
     showView('network');
     syncCoins();
+
+    // Atualiza URL e título da página para compartilhamento
+    const slug = movie.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    history.pushState({ movieId: movie.id }, movie.title, `?m=${movie.id}&t=${slug}`);
+    document.title = `${movie.title} — Cinemap`;
+
     await new Promise(r=>setTimeout(r,40));
     buildGraph(movie, related);
   } catch(e) {
@@ -1216,6 +1222,7 @@ function buildGraph(center, related) {
   // node groups
   const nodeG = g.append('g').selectAll('g').data(nodes).join('g')
     .attr('class','node-g')
+    .attr('opacity', 0)
     .call(drag(sim));
 
   nodeG.each(function(d) {
@@ -1330,6 +1337,13 @@ function buildGraph(center, related) {
       );
     }
   });
+
+  // fade-in dos nós após a simulação estabilizar um pouco
+  sim.on('end', () => {
+    nodeG.transition().duration(600).attr('opacity', 1);
+  });
+  // fallback: garante visibilidade após 1.5s caso 'end' demore
+  setTimeout(() => nodeG.transition().duration(400).attr('opacity', 1), 1500);
 
   // zoom buttons
   $('z-in').onclick  = ()=> svg.transition().duration(300).call(zoom.scaleBy,1.5);
@@ -1469,6 +1483,8 @@ $('bs-explore').addEventListener('click', async () => {
 $('back-btn').addEventListener('click', ()=>{
   if (S.sim) S.sim.stop();
   closeBS();
+  history.pushState(null, '', '/');
+  document.title = 'Cinemap: Descubra filmes e explore o universo do cinema';
   showView('home');
 });
 
@@ -1774,6 +1790,40 @@ function saveConfig() {
   else sessionStorage.removeItem('cm_tmdb_key');
   location.reload();
 }
+
+// ─────────────────────────────────────────
+// POPSTATE — botão voltar/avançar do browser
+// ─────────────────────────────────────────
+window.addEventListener('popstate', async (ev) => {
+  if (ev.state?.movieId) {
+    showLoad();
+    try {
+      const d = await apiFetch(`/movie/${ev.state.movieId}`);
+      if (d?.id) { await loadNetwork(d); }
+    } catch(e) { hideLoad(); }
+  } else {
+    if (S.sim) S.sim.stop();
+    document.title = 'Cinemap: Descubra filmes e explore o universo do cinema';
+    showView('home');
+  }
+});
+
+// ─────────────────────────────────────────
+// AUTO-LOAD — abre rede direto pela URL compartilhada
+// ─────────────────────────────────────────
+(async function() {
+  const p = new URLSearchParams(location.search);
+  const movieId = p.get('m');
+  const payment = p.get('payment');
+  const reset   = p.get('reset');
+  if (movieId && !payment && !reset) {
+    showLoad();
+    try {
+      const d = await apiFetch(`/movie/${movieId}`);
+      if (d?.id) await loadNetwork(d);
+    } catch(e) { hideLoad(); }
+  }
+})();
 
 // ─────────────────────────────────────────
 // RESIZE
