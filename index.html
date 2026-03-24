@@ -391,7 +391,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <circle cx="55" cy="45" r="3.2" fill="#deeeff"/>
     </svg><span>Cine<span style="color:var(--accent)">map</span></span>
   </div>
-  <div id="coin-display">🪙 3/3</div>
+  <div id="coin-display">🪙 2/2</div>
   <div id="auth-btns">
     <div id="user-info" style="display:none"></div>
     <button class="btn" id="btn-logout" style="display:none" onclick="doLogout()">Sair</button>
@@ -452,7 +452,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <span id="net-title">—</span>
       <span id="net-year"></span>
     </div>
-    <span id="net-coins">🪙 5/5</span>
+    <span id="net-coins">🪙 2/2</span>
     <button class="btn" id="shuffle-btn">Me indique outros filmes (1)</button>
     <button class="btn" onclick="doShare()">Compartilhar</button>
   </div>
@@ -1023,9 +1023,15 @@ async function fetchRelated(movie, temperature=0.7, excludeIds=[], excludeTitles
   const centerTitle = normTitle(movie.title);
   const isCenter = m => m.id === movie.id || normTitle(m.title) === centerTitle;
 
-  // ── Tenta curadoria via Groq ──
-  const groqItems = await askGroq(movie.title, temperature, excludeTitles);
-  if (groqItems !== null && groqItems.length > 0) {
+  // ── Groq e TMDB em paralelo (Groq com timeout de 5s) ──
+  const groqPromise = Promise.race([
+    askGroq(movie.title, temperature, excludeTitles),
+    new Promise(r => setTimeout(() => r(null), 5000))
+  ]);
+  const [groqItems, rec1] = await Promise.all([groqPromise, getRecommended(movie.id)]);
+
+  // Resultados do Groq têm prioridade
+  if (groqItems && groqItems.length > 0) {
     const searches = await Promise.all(
       groqItems.map(item => searchMovies(item.title).then(d => {
         const m = (d.results||[])[0];
@@ -1036,31 +1042,25 @@ async function fetchRelated(movie, temperature=0.7, excludeIds=[], excludeTitles
     related = searches.filter(m => m && filterRec(m) && !excludeIds.includes(m.id) && !isCenter(m));
   }
 
-  // ── Fallback + complemento para atingir 10 nós ──
-  if (related.length < 10) {
-    const seen = new Set([...excludeIds, movie.id, ...related.map(m => m.id)]);
-    const addUnique = (arr) => {
-      for (const m of arr) {
-        if (related.length >= 10) break;
-        if (!seen.has(m.id) && !isCenter(m)) { related.push({ ...m, connectionType: m.connectionType||'tema' }); seen.add(m.id); }
-      }
-    };
-
-    // página 1 de recommendations
-    const rec1 = await getRecommended(movie.id);
-    addUnique((rec1.results||[]).filter(filterFallback));
-
-    // página 2 se ainda faltar
-    if (related.length < 8) {
-      const rec2 = await apiFetch(`/movie/${movie.id}/recommendations`, {page:2});
-      addUnique((rec2.results||[]).filter(filterFallback));
+  // ── Complemento com resultados TMDB já carregados ──
+  const seen = new Set([...excludeIds, movie.id, ...related.map(m => m.id)]);
+  const addUnique = (arr) => {
+    for (const m of arr) {
+      if (related.length >= 10) break;
+      if (!seen.has(m.id) && !isCenter(m)) { related.push({ ...m, connectionType: m.connectionType||'tema' }); seen.add(m.id); }
     }
+  };
 
-    // /similar como último recurso
-    if (related.length < 8) {
-      const sim = await apiFetch(`/movie/${movie.id}/similar`, {page:1});
-      addUnique((sim.results||[]).filter(filterFallback));
-    }
+  addUnique((rec1.results||[]).filter(filterFallback));
+
+  if (related.length < 8) {
+    const rec2 = await apiFetch(`/movie/${movie.id}/recommendations`, {page:2});
+    addUnique((rec2.results||[]).filter(filterFallback));
+  }
+
+  if (related.length < 8) {
+    const sim = await apiFetch(`/movie/${movie.id}/similar`, {page:1});
+    addUnique((sim.results||[]).filter(filterFallback));
   }
 
   // Deduplicate by ID
