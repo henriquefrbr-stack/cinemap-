@@ -905,6 +905,7 @@ function renderAC(movies) {
       ${m.vote_average ? `<div class="ac-rate">★ ${m.vote_average.toFixed(1)}</div>` : ''}`;
     d.addEventListener('click', async ()=>{
       if (!await spendCoin()) return;
+      gtag('event', 'search', { search_term: m.title });
       closeAC();
       $('search-input').value = m.title;
       loadNetwork(m);
@@ -943,6 +944,7 @@ async function doSearch(q) {
     const d = await searchMovies(q);
     const movies = d.results||[];
     if (!movies.length) { toast('Nenhum filme encontrado.','err'); hideLoad(); return; }
+    gtag('event', 'search', { search_term: q });
     closeAC();
     await loadNetwork(movies[0]);
   } catch(e) {
@@ -1257,6 +1259,11 @@ function buildGraph(center, related) {
       // Desktop: click related node → load new network
       if (d.type === 'r') {
         if (!await spendCoin()) return;
+        gtag('event', 'explore_connection', {
+          from_movie: S.movie?.title,
+          to_movie: d.m.title,
+          connection_type: d.connectionType || 'tema'
+        });
         hideTip();
         await loadNetwork(d.m);
       }
@@ -1399,6 +1406,11 @@ $('bs-explore').addEventListener('click', async () => {
   const m = S.bsMovie;
   if (!m) return;
   if (!await spendCoin()) return;
+  gtag('event', 'explore_connection', {
+    from_movie: S.movie?.title,
+    to_movie: m.title,
+    connection_type: 'mobile'
+  });
   closeBS();
   await loadNetwork(m);
 });
