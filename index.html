@@ -63,6 +63,20 @@
 }
 </script>
 
+<!-- FAQ Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"O que é o Cinemap?","acceptedAnswer":{"@type":"Answer","text":"O Cinemap é uma plataforma de descoberta de filmes. Você busca um filme e visualiza uma rede interativa com títulos relacionados por diretor, tema, época ou afinidade."}},
+    {"@type":"Question","name":"Como funciona a rede de filmes?","acceptedAnswer":{"@type":"Answer","text":"Cada nó da rede representa um filme. O título central é o que você buscou; os nós ao redor são recomendações conectadas por tipo de relação."}},
+    {"@type":"Question","name":"O Cinemap é gratuito?","acceptedAnswer":{"@type":"Answer","text":"Sim. O plano gratuito oferece 4 moedas por dia. O plano Premium libera 999 moedas diárias por R$ 9,90/mês."}},
+    {"@type":"Question","name":"O que são as moedas?","acceptedAnswer":{"@type":"Answer","text":"Cada busca ou exploração de conexão consome 1 moeda. As moedas se renovam automaticamente todo dia."}}
+  ]
+}
+</script>
+
 <!-- Google Analytics GA4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMC2F4M25G"></script>
 <script>
@@ -142,6 +156,17 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .chips{margin-top:26px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .chip{font-family:'Inter',sans-serif;font-size:13px;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s}
 .chip:hover{border-color:var(--accent-dim);color:var(--text);background:rgba(200,214,229,.05)}
+
+/* ── FAQ ── */
+.faq-wrap{width:100%;max-width:600px;margin:48px auto 60px;padding:0 24px}
+.faq-title{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);text-align:center;margin-bottom:20px}
+.faq-list{display:flex;flex-direction:column;gap:2px}
+.faq-item{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s}
+.faq-item:hover{border-color:#2a3040}
+.faq-item summary{font-size:14px;font-weight:500;color:var(--text);padding:14px 16px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.faq-item summary::after{content:'＋';font-size:14px;color:var(--text-dim);flex-shrink:0;transition:transform .2s}
+.faq-item[open] summary::after{transform:rotate(45deg)}
+.faq-item p{font-size:13px;color:var(--text-dim);line-height:1.7;padding:0 16px 14px}
 
 /* ── NETWORK ── */
 #network-view{position:fixed;inset:0;background:var(--bg)}
@@ -392,6 +417,29 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <div id="ac-drop"></div>
     </div>
     <div class="chips" id="chips"></div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-wrap">
+    <h2 class="faq-title">Perguntas frequentes</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>O que é o Cinemap?</summary>
+        <p>O Cinemap é uma plataforma de descoberta de filmes. Você busca um filme e visualiza uma rede interativa com títulos relacionados por diretor, tema, época ou afinidade — facilitando encontrar o próximo filme para assistir.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Como funciona a rede de filmes?</summary>
+        <p>Cada nó da rede representa um filme. O título central é o que você buscou; os nós ao redor são recomendações conectadas por tipo de relação. Clique em qualquer nó para explorar uma nova rede a partir daquele filme.</p>
+      </details>
+      <details class="faq-item">
+        <summary>O Cinemap é gratuito?</summary>
+        <p>Sim. O plano gratuito oferece 4 moedas por dia para explorar filmes. O plano Premium libera 999 moedas diárias por R$ 9,90/mês.</p>
+      </details>
+      <details class="faq-item">
+        <summary>O que são as moedas?</summary>
+        <p>Cada busca ou exploração de conexão consome 1 moeda. As moedas se renovam automaticamente todo dia, sem precisar fazer nada.</p>
+      </details>
+    </div>
   </div>
 </div>
 
