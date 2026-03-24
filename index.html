@@ -405,7 +405,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <span id="net-year"></span>
     </div>
     <span id="net-coins">🪙 5/5</span>
-    <button class="btn" id="shuffle-btn">Me indique outros filmes (3)</button>
+    <button class="btn" id="shuffle-btn">Me indique outros filmes (1)</button>
     <button class="btn" onclick="doShare()">Compartilhar</button>
   </div>
   <svg id="net-svg"></svg>
@@ -435,7 +435,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <div class="plan-price"><sup>R$</sup>0<small>/mês</small></div>
         <div class="plan-period">Gratuito para sempre</div>
         <ul class="plan-feat">
-          <li>5 moedas por dia</li>
+          <li>4 moedas por dia</li>
           <li>Rede interativa de filmes</li>
           <li>Busca com autocomplete</li>
           <li class="off">Sem anúncios</li>
@@ -540,7 +540,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <div class="modal">
     <button class="modal-x" onclick="closeModal('gate-modal');if(S.view==='network'){if(S.sim)S.sim.stop();showView('home');}">✕</button>
     <h3>🎬 Continue explorando</h3>
-    <p>Você usou suas 3 buscas gratuitas. Crie uma conta grátis e ganhe <strong>5 moedas por dia</strong> para continuar descobrindo filmes.</p>
+    <p>Você usou suas 2 buscas gratuitas. Crie uma conta grátis e ganhe <strong>4 moedas por dia</strong> para continuar descobrindo filmes.</p>
     <button class="btn btn-primary" style="width:100%;padding:12px;font-size:14px;margin-bottom:10px" onclick="closeModal('gate-modal');switchTab('signup');openModal('auth-modal')">Criar conta grátis</button>
     <button class="btn" style="width:100%;padding:12px;font-size:14px" onclick="closeModal('gate-modal');switchTab('login');openModal('auth-modal')">Já tenho conta</button>
   </div>
@@ -618,8 +618,25 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 // ─────────────────────────────────────────
 const W185   = 'https://image.tmdb.org/t/p/w185';
 const W500   = 'https://image.tmdb.org/t/p/w500';
-const MAX_C  = 5;
-const GUEST_MAX = 3;
+const MAX_C  = 4;
+const GUEST_MAX = 2;
+
+// Guest coin helpers — localStorage com reset diário automático
+function getGuestCoins() {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const saved = JSON.parse(localStorage.getItem('cm_guest') || '{}');
+    if (saved.date === today) return saved.coins ?? GUEST_MAX;
+    saveGuestCoins(GUEST_MAX); // novo dia → reseta
+    return GUEST_MAX;
+  } catch(e) { return GUEST_MAX; }
+}
+function saveGuestCoins(n) {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    localStorage.setItem('cm_guest', JSON.stringify({ date: today, coins: n }));
+  } catch(e) {}
+}
 const CHIPS  = ['Inception','Interstellar','Parasite','The Dark Knight',
                 'Pulp Fiction','Amélie','1917','Whiplash','The Matrix','Oppenheimer'];
 
@@ -637,12 +654,12 @@ const NN = { w:56, h:84,  rx:6 };  // related nodes
 // STATE
 // ─────────────────────────────────────────
 const S = {
-  coins            : +(sessionStorage.getItem('cm_guest_coins') ?? GUEST_MAX),
+  coins            : getGuestCoins(),
   view             : 'home',
   movie            : null,
   sim              : null,
   bsMovie          : null,
-  shuffleLeft      : 3,
+  shuffleLeft      : 1,
   shownMovieIds    : [],
   shownMovieTitles : [],
   user             : null,
@@ -650,9 +667,8 @@ const S = {
   plan             : 'free',
 };
 
-if (sessionStorage.getItem('cm_guest_coins') === null) {
-  sessionStorage.setItem('cm_guest_coins', GUEST_MAX);
-}
+// garante que guest tem entrada no localStorage logo ao carregar
+if (!localStorage.getItem('cm_guest')) saveGuestCoins(GUEST_MAX);
 
 // ─────────────────────────────────────────
 // UTILS
@@ -706,18 +722,18 @@ async function spendCoin() {
       if (r.status === 402) { S.coins = 0; syncCoins(); openModal('nocoins-modal'); return false; }
       if (r.ok) {
         const data = await r.json();
-        S.coins = data.coins;
+        S.coins = data.coins; // servidor é a fonte da verdade
       } else {
-        S.coins--;
+        return false; // falha no servidor → não debita local
       }
     } catch(e) {
-      S.coins--;
+      return false; // erro de rede → não debita local
     }
   } else {
     // Convidado: debita local
     if (S.coins <= 0) { openModal('gate-modal'); return false; }
     S.coins--;
-    sessionStorage.setItem('cm_guest_coins', S.coins);
+    saveGuestCoins(S.coins);
   }
   syncCoins();
   if (S.coins === 1) toast('⚠️ Apenas 1 moeda restante!','warn');
@@ -1011,7 +1027,7 @@ async function loadNetwork(movie) {
     S.shownMovieTitles = [];
     const related = await fetchRelated(movie);
     S.movie = movie;
-    S.shuffleLeft = 3;
+    S.shuffleLeft = S.user ? 2 : 1;
     syncShuffleBtn();
 
     // Registrar todos os filmes exibidos
@@ -1502,7 +1518,7 @@ function switchTab(mode) {
     $('auth-password').autocomplete = 'current-password';
   } else {
     $('auth-title').textContent = 'Criar sua conta';
-    $('auth-subtitle').textContent = 'Grátis para sempre · 5 moedas por dia';
+    $('auth-subtitle').textContent = 'Grátis para sempre · 4 moedas por dia';
     $('auth-submit').textContent = 'Criar conta grátis';
     $('auth-switch-txt').innerHTML = 'Já tem conta? <a onclick="switchTab(\'login\')">Entrar</a>';
     $('auth-forgot-lnk').style.display = 'none';
@@ -1587,7 +1603,7 @@ async function setUser(session, showToast=false) {
   if (!session) {
     S.user  = null;
     S.token = null;
-    S.coins = +(sessionStorage.getItem('cm_guest_coins') ?? GUEST_MAX);
+    S.coins = getGuestCoins();
     $('user-info').style.display  = 'none';
     $('btn-logout').style.display = 'none';
     $('btn-login').style.display  = '';
@@ -1624,7 +1640,7 @@ async function setUser(session, showToast=false) {
 
 async function doLogout() {
   await _supa.auth.signOut();
-  sessionStorage.setItem('cm_guest_coins', GUEST_MAX);
+  saveGuestCoins(GUEST_MAX);
   await setUser(null);
   toast('Até logo!', '');
 }

@@ -27,7 +27,7 @@ export default async function handler(req, res) {
   // Reset diário de moedas
   const today = new Date().toISOString().split('T')[0];
   if (profile.coins_reset_at !== today) {
-    const maxCoins = profile.plan === 'premium' ? 999 : 5;
+    const maxCoins = profile.plan === 'premium' ? 999 : 4;
     await supabase
       .from('profiles')
       .update({ coins: maxCoins, coins_reset_at: today })
